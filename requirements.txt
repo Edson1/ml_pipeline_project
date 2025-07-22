@@ -1,0 +1,6 @@
+aws-cdk-lib
+constructs
+pandas
+scikit-learn
+sagemaker
+boto3
