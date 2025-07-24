@@ -43,7 +43,7 @@ Verify the executed steps and pipeline resources from AWS SageMaker AI website:
 ---
 Logs are available in AWS CloudWatch Logs 
 
-## 7. Test the AWS SageMaker inference endpoint (internally) using the sagemaker-runtime client:
+## 5. Test the AWS SageMaker inference endpoint (internally) using the sagemaker-runtime client:
 python call_endpoint.py
 
 ---
