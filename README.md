@@ -20,15 +20,6 @@ pip install -r requirements.txt
 ## 2. Deploys the CDK toolkit stack into the AWS environment (just one time):
 cdk bootstrap
 
-CDKToolkit |  1/12 | 8:25:15 p.m. | CREATE_COMPLETE      | AWS::SSM::Parameter        | CdkBootstrapVersion
-CDKToolkit |  2/12 | 8:25:15 p.m. | CREATE_COMPLETE      | AWS::ECR::Repository       | ContainerAssetsRepository
-CDKToolkit |  3/12 | 8:25:28 p.m. | CREATE_COMPLETE      | AWS::S3::Bucket            | StagingBucket 
-CDKToolkit |  4/12 | 8:25:31 p.m. | CREATE_COMPLETE      | AWS::S3::BucketPolicy      | StagingBucketPolicy 
-CDKToolkit |  5/12 | 8:25:31 p.m. | CREATE_COMPLETE      | AWS::IAM::Role             | CloudFormationExecutionRole 
-CDKToolkit | 11/12 | 8:25:51 p.m. | CREATE_COMPLETE      | AWS::IAM::Role             | DeploymentActionRole
-CDKToolkit | 12/12 | 8:25:52 p.m. | CREATE_COMPLETE      | AWS::CloudFormation::Stack | CDKToolkit 
-...
-
 ## 3. Deploys the MLPipelineStack stack (ml_pipeline_stack.py) into your AWS account with CDK (validate it in AWS CloudFormation stacks) :
 cdk deploy
 
@@ -38,7 +29,7 @@ Upload train.csv file to your bucket S3 in a folder called "raw".
 - {mlpipelinestack-titanicdatabucket...}/raw/train.csv
 
 ## 5. Add variable values to the run_pipeline.py file for created AWS resources 
-The S3 bucket name mlpipelinestack-titanicdatabucket..., and the IAM role ARN MLPipelineStack-SageMakerExecutionRole..., examples in run_pipeline.py: 
+The S3 bucket name mlpipelinestack-titanicdatabucket..., and the IAM role ARN (of MLPipelineStack-SageMakerExecutionRole...), examples in run_pipeline.py: 
 
 - bucket = "mlpipelinestack-titanicdatabucketd9d6679f-btxu30qsq0jm" 
 - role = "arn:aws:iam::430118855959:role/MLPipelineStack-SageMakerExecutionRole7843F3B8-wOPA9ROkzTXa" 
@@ -67,22 +58,22 @@ Model requires 12 features for a single prediction. Edit the Payload in call_end
 ---
 Valid feature types:
 {
-    Sex: int
-    Age: float
-    SibSp: int
-    Parch: int
-    Ticket: int
-    Fare: float
-    Embarked_C: int
-    Embarked_Q: int
-    Embarked_S: int
-    Pclass_1: int
-    Pclass_2: int
+    Sex: int,
+    Age: float,
+    SibSp: int,
+    Parch: int,
+    Ticket: int,
+    Fare: float,
+    Embarked_C: int,
+    Embarked_Q: int,
+    Embarked_S: int,
+    Pclass_1: int,
+    Pclass_2: int,
     Pclass_3: int
 }
 
 ---
-HTTP response will return 1 or 0 for the request data:
+HTTP body response will return 1 or 0 for the request data:
 Prediction: Passenger: 1 = Survived, 0 = Not Survived.
 
 ## external POST request to the AWS SageMaker endpoint will need a AWS token for API authorization:
