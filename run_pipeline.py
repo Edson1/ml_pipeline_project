@@ -16,11 +16,22 @@ from sagemaker.model import Model
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-# Update this variable values (S3 bucket name and IAM role ARN) created by ml_pipeline_stack.py:  
-bucket = "mlpipelinestack-titanicdatabucketd9d6679f-yrfkwcthhfo9" 
-role = "arn:aws:iam::430118855959:role/MLPipelineStack-SageMakerExecutionRole7843F3B8-LxWIx91yLHSd" 
+# Function to get CDK outputs from the CloudFormation stack
+def get_cdk_outputs(stack_name: str):
+    cf = boto3.client("cloudformation")
+    response = cf.describe_stacks(StackName=stack_name)
+    outputs = response["Stacks"][0].get("Outputs", [])
+    return {o["OutputKey"]: o["OutputValue"] for o in outputs}
+
+cdk_outputs = get_cdk_outputs("MLPipelineStack")
+
+bucket = cdk_outputs.get("S3BucketName")
+role = cdk_outputs.get("ExecutionRoleArn")
 
 prefix = "pipeline" #s3 folder for pipeline outputs
+
+print(f"S3 Bucket Name: {bucket}")
+print(f"SageMaker Execution Role ARN: {role}")
 
 # Crear un cliente de SageMaker
 sagemaker_client = boto3.client("sagemaker")
@@ -96,7 +107,17 @@ pipeline = Pipeline(
     sagemaker_session=pipeline_session
 )
 
+# Function to upload raw data to S3 bucket
+def upload_raw_data(bucket_name, local_path, s3_prefix="raw/train.csv"):
+    s3 = boto3.client("s3")
+    s3.upload_file(local_path, bucket_name, s3_prefix)
+    print(f"Uploaded {local_path} to s3://{bucket_name}/{s3_prefix}")
+
 if __name__ == "__main__":
+    # Upload the raw data to S3 bucket
+    upload_raw_data(bucket, "train.csv")
+    time.sleep(30)
+
     # Create or update the pipeline
     pipeline.upsert(role_arn=role)
 

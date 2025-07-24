@@ -263,7 +263,7 @@
   "CDKMetadata": {
    "Type": "AWS::CDK::Metadata",
    "Properties": {
-    "Analytics": "v2:deflate64:H4sIAAAAAAAA/13KQQ6CMBAF0LOwLyNCwl5cmxA4gKml4gi0pNNKSMPdDRaDcfX//HkppEkOScQnikXTxT3ewNeWi47xia6eMvCFE5207HxXWwtR6h7FvM/hXhjyAXyle7m+PrnLzSzs7MjqoZKknRFB/vQLH0dU7Z8qjX5hI03BSbITkbS15e3qvmJh5WwfWh0yOKaQR09CjI1TFgcJVcg3xqZvZPIAAAA="
+    "Analytics": "v2:deflate64:H4sIAAAAAAAA/12LQQ6CMBBFz8K+jAgJe2FtJHAAU0vFCrSkM5UQwt0NlgTi6v0/834McZRCFPARQ1G3YaceMFfERcv4iPcZE5gzJ1pJLH/qLXkUplNi2s++L0zxHubSdHJ9/bibm7Ow3CGZvpRonBXePOQrHwalmz+rsOajamkzjpJdECVVxJvVO25vjgZHCysmehl9SuAcQxq8UanQOk2ql1B6fgE5Back/AAAAA=="
    },
    "Metadata": {
     "aws:cdk:path": "MLPipelineStack/CDKMetadata/Default"
@@ -401,6 +401,21 @@
    },
    "us-west-2": {
     "value": "nodejs22.x"
+   }
+  }
+ },
+ "Outputs": {
+  "S3BucketName": {
+   "Value": {
+    "Ref": "TitanicDataBucketD9D6679F"
+   }
+  },
+  "ExecutionRoleArn": {
+   "Value": {
+    "Fn::GetAtt": [
+     "SageMakerExecutionRole7843F3B8",
+     "Arn"
+    ]
    }
   }
  },

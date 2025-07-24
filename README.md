@@ -23,21 +23,16 @@ cdk bootstrap
 ## 3. Deploys the MLPipelineStack stack (ml_pipeline_stack.py) into your AWS account with CDK (validate it in AWS CloudFormation stacks) :
 cdk deploy
 
-## 4. Upload the dataset to AWS S3 bucket as train.csv
-Upload train.csv file to your bucket S3 in a folder called "raw". 
+---
+It creates or updates the MLPipelineStack stack, which has output with S3 bucket name mlpipelinestack-titanicdatabucket... and the IAM role ARN (of MLPipelineStack-SageMakerExecutionRole...).
 
-- {mlpipelinestack-titanicdatabucket...}/raw/train.csv
-
-## 5. Add variable values to the run_pipeline.py file for created AWS resources 
-The S3 bucket name mlpipelinestack-titanicdatabucket..., and the IAM role ARN (of MLPipelineStack-SageMakerExecutionRole...), examples in run_pipeline.py: 
-
-- bucket = "mlpipelinestack-titanicdatabucketd9d6679f-btxu30qsq0jm" 
-- role = "arn:aws:iam::430118855959:role/MLPipelineStack-SageMakerExecutionRole7843F3B8-wOPA9ROkzTXa" 
-
-## 6. Run pipeline and deploy the model in SageMaker inference endpoint
+## 4. Run pipeline and deploy the model in SageMaker inference endpoint
 python run_pipeline.py
 
 ---
+It upload the Titanic dataset (train.csv file) to your S3 bucket in a folder called "raw". 
+- {mlpipelinestack-titanicdatabucket...}/raw/train.csv
+
 Verify the executed steps and pipeline resources from AWS SageMaker AI website:
 - Processing / Processing Jobs
 - Training / Training Jobs

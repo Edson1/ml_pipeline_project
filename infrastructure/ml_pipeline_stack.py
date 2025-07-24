@@ -3,7 +3,8 @@ from aws_cdk import (
     aws_s3 as s3,
     aws_iam as iam,
     aws_sagemaker as sagemaker,
-    RemovalPolicy
+    RemovalPolicy,
+    CfnOutput
 )
 from constructs import Construct
 
@@ -29,3 +30,5 @@ class MLPipelineStack(Stack):
         # Política para permitir acceso a el bucket creado: GetObject, PutObject, ListBucket
         bucket.grant_read_write(role) 
 
+        CfnOutput(self, "S3BucketName", value=bucket.bucket_name)
+        CfnOutput(self, "ExecutionRoleArn", value=role.role_arn)
