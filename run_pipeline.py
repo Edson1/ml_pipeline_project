@@ -16,12 +16,13 @@ from sagemaker.model import Model
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-# Parámetros de recursos AWS creados por el ml_pipeline_stack.py:  
+# Update this variable values (S3 bucket name and IAM role ARN) created by ml_pipeline_stack.py:  
 bucket = "mlpipelinestack-titanicdatabucketd9d6679f-yrfkwcthhfo9" 
 role = "arn:aws:iam::430118855959:role/MLPipelineStack-SageMakerExecutionRole7843F3B8-LxWIx91yLHSd" 
+
 prefix = "pipeline" #s3 folder for pipeline outputs
 
-# Crear cliente de SageMaker
+# Crear un cliente de SageMaker
 sagemaker_client = boto3.client("sagemaker")
 
 # Crear una sesión de SageMaker Pipeline
@@ -31,7 +32,7 @@ pipeline_session = PipelineSession()
 input_data = ParameterString(name="InputDataUrl", default_value=f"s3://{bucket}/raw/train.csv")
 model_output = ParameterString(name="ModelOutput", default_value=f"s3://{bucket}/ml/model")
 
-# SageMaker Pipeline step1 with Preprocessing instance. ml.m5.xlarge not vailable for precessing job
+# SageMaker Pipeline step1 with Preprocessing instance. ml.m5.xlarge not valid for precessing job
 sklearn_processor = SKLearnProcessor(
     framework_version="0.23-1",
     role=role,
@@ -41,6 +42,8 @@ sklearn_processor = SKLearnProcessor(
     sagemaker_session=pipeline_session
 )
 
+# The preprocessing step will output a processed CSV file to the specified S3 bucket
+# The preprocessing.py "output" (processed.csv) will be used as input for the training step
 step_process = ProcessingStep(
     name="TitanicPreprocessing",
     processor=sklearn_processor,
@@ -48,11 +51,8 @@ step_process = ProcessingStep(
     outputs=[ProcessingOutput(output_name="output",  source="/opt/ml/processing/output", destination=f"s3://{bucket}/processed.csv")],
     code="pipeline/processing/preprocessing.py"
 )
-# The preprocessing step will output a processed CSV file to the specified S3 bucket
-# The "output" will be used as input for the training step
 
-# SageMaker Pipeline step2 with Training instance
-# This step will use the output from the preprocessing step
+# SageMaker Pipeline step2 with Training instance and train.py. This step will use the output (processed.csv) from the preprocessing step
 sklearn_estimator = SKLearn(
     entry_point="pipeline/training/train.py",
     role=role,
@@ -62,6 +62,7 @@ sklearn_estimator = SKLearn(
     sagemaker_session=pipeline_session
 )
 
+#trained model is saved in S3://sagemaker-..../pipelines-.....-TitanicTraining-..../output/model.tar.gz 
 step_train = TrainingStep(
     name="TitanicTraining",
     estimator=sklearn_estimator,
@@ -70,7 +71,6 @@ step_train = TrainingStep(
         content_type="text/csv"
     )}
 )
-#trained model saved in S3://sagemaker-..../pipelines-.....-TitanicTraining-..../output/model.tar.gz 
 
 # SageMaker Pipeline step3: Register the trained model artifact in SageMaker Model Registry 
 model = Model(
@@ -81,12 +81,12 @@ model = Model(
     entry_point="pipeline/inference/inference.py"
 )
 
-#CreateModel from registered model
+#Create Model Registry with inference function from inference.py 
+#Inference Model registered in Container1 arn:aws:sagemaker:...:model/pipelines-...-TitanicModelRegistra-...
 step_register = CreateModelStep(
     name="TitanicModelRegistration",
     model=model
 )
-#Inference Model registered in Container1 arn:aws:sagemaker:...:model/pipelines-...-TitanicModelRegistra-...
 
 # Define the SageMaker Pipeline with all steps
 pipeline = Pipeline(
@@ -97,8 +97,6 @@ pipeline = Pipeline(
 )
 
 if __name__ == "__main__":
-    #pipeline.delete()  # Uncomment to delete the pipeline if needed
-
     # Create or update the pipeline
     pipeline.upsert(role_arn=role)
 
@@ -148,15 +146,14 @@ if __name__ == "__main__":
 
     print("----------------PipelineParameters list------")
     print(execution.list_parameters())
+
     print("----------------Describe execution------")
     print(execution.describe())
-    #execution.result("TitanicPreprocessing")
 
-    print("Pipeline execution completed")
-
-
+    # Get the model name from the step_register to create endpoint
     model_name = None
 
+    # If the model was not registered, use the last registered model in the Model Registry
     try:
         model_name = str(step_register.properties.ModelName) #.to_string()
         logger.info(f"Model registered: {model_name}")
@@ -207,7 +204,7 @@ if __name__ == "__main__":
                 EndpointConfigName=endpoint_config_name
             )
             print("Endpoint creation started:", response)
-            #fails if instance type (like ml.m4.xlarge) is not available in your region or you’ve hit a service quota
+            #fails if instance type (like ml.m4.xlarge) is not available or you’ve hit a service quota
         except ClientError as e:
             logging.error(e.response["Error"]["Message"])
 

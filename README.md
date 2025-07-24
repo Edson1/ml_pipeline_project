@@ -61,7 +61,7 @@ Logs are available in AWS CloudWatch Logs
 python call_endpoint.py
 
 ---
-Model requires 12 features for one prediction, edit Payload in call_endpoint.py for other tests:
+Model requires 12 features for a single prediction. Edit the Payload in call_endpoint.py for other tests:
 - [Sex,Age,SibSp,Parch,Ticket,Fare,Embarked_C,Embarked_Q,Embarked_S,Pclass_1,Pclass_2,Pclass_3]
 - Request Payload example: [33, 22.0, 1, 0, 7.25, 0, 1, 0, 0, 0, 0, 1] 
 ---

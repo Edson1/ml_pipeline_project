@@ -1,7 +1,5 @@
 import pandas as pd
-import os
 
-# Preprocessing function to handle missing values and categorical variables
 def preprocess(input_path, output_path):
     df = pd.read_csv(input_path)
     
@@ -11,8 +9,7 @@ def preprocess(input_path, output_path):
     df['Cabin'].fillna('Unknown', inplace=True)
 
     # Handle missing Embarked values
-    # 'S' is the most common embarkation point
-    # 'C' and 'Q' are also common, but we fill missing values with 'S'
+    # 'S' is the most common embarkation point, 'C' and 'Q' are also common, but we fill missing values with 'S'
     df['Embarked'].fillna('S', inplace=True)    
     
     # Convert categorical variables to numerical 0 or 1
@@ -28,8 +25,6 @@ def preprocess(input_path, output_path):
     # 'Name' and 'Cabin' are not used in the model, so we drop them
     df.drop(['Name', 'Cabin'], axis=1, inplace=True)
     
-    ###os.makedirs(output_path, exist_ok=True)
-
     # Save the processed DataFrame with selected features 'Sex', 'Age', 'Fare', 'Embarked_C', 'Embarked_Q', 'Embarked_S'...
     df.to_csv(output_path, index=False)
 

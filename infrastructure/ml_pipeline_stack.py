@@ -26,6 +26,6 @@ class MLPipelineStack(Stack):
                 ]
         )
 
-        # Política para permitir acceso a el bucket creado
-        bucket.grant_read_write(role)  #GetObject, PutObject, ListBucket 
+        # Política para permitir acceso a el bucket creado: GetObject, PutObject, ListBucket
+        bucket.grant_read_write(role) 
 
